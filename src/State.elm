@@ -10,8 +10,8 @@ init =
     ( { frame =
             { x = 0
             , y = 0
-            , width = 60
-            , height = 40
+            , width = 50
+            , height = 50
             }
       , seed = initialSeed 1
       , elapsed = 0
