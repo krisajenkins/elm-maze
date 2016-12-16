@@ -1,14 +1,16 @@
 module Types exposing (..)
 
 import Random exposing (..)
+import Window
 
 
 type Msg
     = ChangeMaze
+    | Resize Window.Size
 
 
 type alias Model =
-    { frame : Box
+    { frame : Maybe Box
     , seed : Seed
     }
 

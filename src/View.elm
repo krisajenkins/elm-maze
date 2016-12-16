@@ -24,29 +24,34 @@ pair =
 
 root : Model -> Html Msg
 root model =
-    Html.Keyed.node "div"
-        []
-        [ ( toString model.seed
-          , svg
-                [ width "100vw"
-                , height "100vh"
-                , viewBox
-                    (F.print (F.int <> s " " <> F.int <> s " " <> F.int <> s " " <> F.int)
-                        (model.frame.x - 1)
-                        (model.frame.y - 1)
-                        (model.frame.width + 2)
-                        (model.frame.height + 2)
-                    )
-                , Html.onClick ChangeMaze
+    case model.frame of
+        Nothing ->
+            text ""
+
+        Just frame ->
+            Html.Keyed.node "div"
+                []
+                [ ( toString model.seed
+                  , svg
+                        [ width "100vw"
+                        , height "100vh"
+                        , viewBox
+                            (F.print (F.int <> s " " <> F.int <> s " " <> F.int <> s " " <> F.int)
+                                (frame.x - 1)
+                                (frame.y - 1)
+                                (frame.width + 2)
+                                (frame.height + 2)
+                            )
+                        , Html.onClick ChangeMaze
+                        ]
+                        [ border frame
+                        , g []
+                            <| List.map (Svg.lazy drawPartition)
+                            <| Tuple.first
+                            <| splitBox Horizontal 0 frame model.seed
+                        ]
+                  )
                 ]
-                [ border model.frame
-                , g []
-                    <| List.map (Svg.lazy drawPartition)
-                    <| Tuple.first
-                    <| splitBox Horizontal 0 model.frame model.seed
-                ]
-          )
-        ]
 
 
 heading : Html msg
