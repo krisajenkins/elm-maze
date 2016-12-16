@@ -1,18 +1,15 @@
 module Types exposing (..)
 
 import Random exposing (..)
-import Time exposing (..)
 
 
 type Msg
     = ChangeMaze
-    | Tick Time
 
 
 type alias Model =
     { frame : Box
     , seed : Seed
-    , elapsed : Time
     }
 
 

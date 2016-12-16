@@ -2,10 +2,12 @@ module View exposing (..)
 
 import Formatting as F exposing ((<>), Format(..), s)
 import Html as Html exposing (Html)
+import Html.Attributes as Html
 import Html.Events as Html
+import Html.Keyed
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Time exposing (Time)
+import Svg.Lazy as Svg
 import Types exposing (..)
 
 
@@ -22,26 +24,35 @@ pair =
 
 root : Model -> Html Msg
 root model =
-    Html.div []
-        [ svg
-            [ width "100vw"
-            , height "100vh"
-            , viewBox
-                (F.print (F.int <> s " " <> F.int <> s " " <> F.int <> s " " <> F.int)
-                    (model.frame.x - 1)
-                    (model.frame.y - 1)
-                    (model.frame.width + 2)
-                    (model.frame.height + 2)
-                )
-            , Html.onClick ChangeMaze
-            ]
-            [ border model.frame
-            , g []
-                <| List.map (drawPartition model.elapsed)
-                <| Tuple.first
-                <| splitBox Horizontal 0 model.frame model.seed
-            ]
+    Html.Keyed.node "div"
+        []
+        [ ( toString model.seed
+          , svg
+                [ width "100vw"
+                , height "100vh"
+                , viewBox
+                    (F.print (F.int <> s " " <> F.int <> s " " <> F.int <> s " " <> F.int)
+                        (model.frame.x - 1)
+                        (model.frame.y - 1)
+                        (model.frame.width + 2)
+                        (model.frame.height + 2)
+                    )
+                , Html.onClick ChangeMaze
+                ]
+                [ border model.frame
+                , g []
+                    <| List.map (Svg.lazy drawPartition)
+                    <| Tuple.first
+                    <| splitBox Horizontal 0 model.frame model.seed
+                ]
+          )
         ]
+
+
+heading : Html msg
+heading =
+    Html.h1 [ Html.style [] ]
+        [ Html.text "Click to regenerate" ]
 
 
 border : Box -> Svg msg
@@ -51,7 +62,7 @@ border frame =
             [ stroke "black"
             , fill "none"
             , strokeWidth "0.3"
-            , strokeLinecap "round"
+            , strokeLinecap "square"
             , points
                 (F.print (pair <> s " " <> pair <> s " " <> pair)
                     ( frame.x + 1, frame.y )
@@ -64,7 +75,7 @@ border frame =
             [ stroke "black"
             , fill "none"
             , strokeWidth "0.3"
-            , strokeLinecap "round"
+            , strokeLinecap "square"
             , points
                 (F.print (pair <> s " " <> pair <> s " " <> pair)
                     ( frame.x + frame.width - 1, frame.y + frame.height )
@@ -76,19 +87,17 @@ border frame =
         ]
 
 
-drawPartition : Time -> Partition -> Svg msg
-drawPartition elapsed partition =
+drawPartition : Partition -> Svg msg
+drawPartition partition =
     case partition.direction of
         Horizontal ->
             g []
-                [ drawWall elapsed
-                    partition.depth
+                [ drawWall partition.depth
                     (partition.a.start)
                     (partition.a.start + partition.a.length)
                     (partition.crossAt)
                     (partition.crossAt)
-                , drawWall elapsed
-                    partition.depth
+                , drawWall partition.depth
                     (partition.b.start + partition.b.length)
                     (partition.b.start)
                     (partition.crossAt)
@@ -97,14 +106,12 @@ drawPartition elapsed partition =
 
         Vertical ->
             g []
-                [ drawWall elapsed
-                    partition.depth
+                [ drawWall partition.depth
                     (partition.crossAt)
                     (partition.crossAt)
                     (partition.a.start)
                     (partition.a.start + partition.a.length)
-                , drawWall elapsed
-                    partition.depth
+                , drawWall partition.depth
                     (partition.crossAt)
                     (partition.crossAt)
                     (partition.b.start + partition.b.length)
@@ -112,24 +119,53 @@ drawPartition elapsed partition =
                 ]
 
 
-drawWall : Time -> Int -> Int -> Int -> Int -> Int -> Svg msg
-drawWall elapsed depth px1 px2 py1 py2 =
+drawWall : Int -> Int -> Int -> Int -> Int -> Svg msg
+drawWall depth px1 px2 py1 py2 =
     let
-        percentage =
-            ((elapsed * 3 / Time.second) - (toFloat depth))
-                |> Basics.min 1
-                |> Basics.max 0
+        lineTime =
+            500
+
+        beginAt =
+            F.print (F.int <> s "ms") (depth * lineTime)
+
+        duration =
+            F.print (F.int <> s "ms") lineTime
     in
-        if percentage == 0 then
-            g [] []
-        else
-            line
-                [ stroke "black"
-                , strokeLinecap "round"
-                , strokeWidth "0.3"
-                , x1 <| toString px1
-                , y1 <| toString py1
-                , x2 <| toString (toFloat px1 + (toFloat (px2 - px1) * percentage))
-                , y2 <| toString (toFloat py1 + (toFloat (py2 - py1) * percentage))
+        line
+            [ stroke "black"
+            , strokeLinecap "square"
+            , strokeWidth "0.3"
+            , x1 <| toString px1
+            , y1 <| toString py1
+            , x2 <| toString px1
+            , y2 <| toString py1
+            , opacity "0"
+            ]
+            [ animate
+                [ attributeName "x2"
+                , from <| toString px1
+                , to <| toString px2
+                , fill "freeze"
+                , begin beginAt
+                , dur duration
                 ]
                 []
+            , animate
+                [ attributeName "y2"
+                , from <| toString py1
+                , to <| toString py2
+                , fill "freeze"
+                , begin beginAt
+                , dur duration
+                ]
+                []
+            , animate
+                [ attributeName "opacity"
+                , from "0"
+                , to "1"
+                , fill "freeze"
+                , begin beginAt
+                , dur "1ms"
+                ]
+                []
+            ]
