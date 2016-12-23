@@ -30,6 +30,8 @@ rotate direction =
             Vertical
 
 
+{-| TODO Make a tree of Partitions and depth becomes a derived fact.
+-}
 type alias Partition =
     { depth : Int
     , direction : Direction
