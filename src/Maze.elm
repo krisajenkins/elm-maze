@@ -9,6 +9,17 @@ generate =
     generateStep Horizontal 0
 
 
+reduceWithSeed : (b -> ( List a, c )) -> ( List a, b ) -> ( List a, c )
+reduceWithSeed f ( paritions, seed ) =
+    let
+        ( newPartitions, newSeed ) =
+            f seed
+    in
+        ( List.append paritions newPartitions
+        , newSeed
+        )
+
+
 generateStep :
     Direction
     -> Int
@@ -24,20 +35,12 @@ generateStep direction depth box seed =
             let
                 substep =
                     generateStep (rotate direction) (depth + 1)
-
-                ( subPartitionsA, seedA ) =
-                    substep subBoxA newSeed
-
-                ( subPartitionsB, seedB ) =
-                    substep subBoxB seedA
             in
-                ( List.concat
-                    [ [ partition ]
-                    , subPartitionsA
-                    , subPartitionsB
+                List.foldl reduceWithSeed
+                    ( [ partition ], newSeed )
+                    [ substep subBoxA
+                    , substep subBoxB
                     ]
-                , seedB
-                )
 
 
 splitBox :
