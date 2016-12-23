@@ -25,14 +25,11 @@ pair =
 
 root : Model -> Html Msg
 root model =
-    case model.frame of
-        Nothing ->
-            text ""
-
-        Just frame ->
+    case ( model.frame, model.seed ) of
+        ( Just frame, Just seed ) ->
             Html.Keyed.node "div"
                 []
-                [ ( toString model.seed
+                [ ( toString seed
                   , svg
                         [ width "100vw"
                         , height "100vh"
@@ -49,10 +46,13 @@ root model =
                         , g []
                             <| List.map (Svg.lazy drawPartition)
                             <| Tuple.first
-                            <| Maze.generate frame model.seed
+                            <| Maze.generate frame seed
                         ]
                   )
                 ]
+
+        _ ->
+            text ""
 
 
 heading : Html msg

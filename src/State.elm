@@ -2,6 +2,8 @@ module State exposing (..)
 
 import Random exposing (..)
 import Task
+import Time
+import Time exposing (Time)
 import Types exposing (..)
 import Window
 
@@ -9,9 +11,12 @@ import Window
 init : ( Model, Cmd Msg )
 init =
     ( { frame = Nothing
-      , seed = initialSeed 1
+      , seed = Nothing
       }
-    , Task.perform Resize Window.size
+    , Cmd.batch
+        [ Task.perform Resize Window.size
+        , Task.perform StartupTime Time.now
+        ]
     )
 
 
@@ -21,7 +26,7 @@ update msg model =
         Resize size ->
             let
                 mazeSimplicity =
-                    20
+                    30
             in
                 ( { model
                     | frame =
@@ -31,13 +36,17 @@ update msg model =
                             , width = size.width // mazeSimplicity
                             , height = size.height // mazeSimplicity
                             }
-                    , seed = initialSeed <| size.width + size.height
                   }
                 , Cmd.none
                 )
 
+        StartupTime t ->
+            ( { model | seed = Just <| initialSeed <| round t }
+            , Cmd.none
+            )
+
         ChangeMaze ->
-            ( { model | seed = Tuple.second <| step bool model.seed }
+            ( { model | seed = Maybe.map (Tuple.second << step bool) model.seed }
             , Cmd.none
             )
 

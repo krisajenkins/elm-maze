@@ -1,17 +1,19 @@
 module Types exposing (..)
 
 import Random exposing (..)
+import Time exposing (Time)
 import Window
 
 
 type Msg
     = ChangeMaze
     | Resize Window.Size
+    | StartupTime Time
 
 
 type alias Model =
     { frame : Maybe Box
-    , seed : Seed
+    , seed : Maybe Seed
     }
 
 
