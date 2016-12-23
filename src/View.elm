@@ -5,6 +5,7 @@ import Html as Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
 import Html.Keyed
+import Maze
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Lazy as Svg
@@ -48,7 +49,7 @@ root model =
                         , g []
                             <| List.map (Svg.lazy drawPartition)
                             <| Tuple.first
-                            <| splitBox Horizontal 0 frame model.seed
+                            <| Maze.generate frame model.seed
                         ]
                   )
                 ]

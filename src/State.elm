@@ -19,18 +19,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Resize size ->
-            ( { model
-                | frame =
-                    Just
-                        { x = 0
-                        , y = 0
-                        , width = size.width // 15
-                        , height = size.height // 15
-                        }
-                , seed = initialSeed <| size.width + size.height
-              }
-            , Cmd.none
-            )
+            let
+                mazeSimplicity =
+                    20
+            in
+                ( { model
+                    | frame =
+                        Just
+                            { x = 0
+                            , y = 0
+                            , width = size.width // mazeSimplicity
+                            , height = size.height // mazeSimplicity
+                            }
+                    , seed = initialSeed <| size.width + size.height
+                  }
+                , Cmd.none
+                )
 
         ChangeMaze ->
             ( { model | seed = Tuple.second <| step bool model.seed }
