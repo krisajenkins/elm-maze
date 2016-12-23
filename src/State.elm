@@ -15,7 +15,7 @@ init =
       }
     , Cmd.batch
         [ Task.perform Resize Window.size
-        , Task.perform StartupTime Time.now
+        , Task.perform (round >> SetSeed) Time.now
         ]
     )
 
@@ -40,12 +40,12 @@ update msg model =
                 , Cmd.none
                 )
 
-        StartupTime t ->
-            ( { model | seed = Just <| initialSeed <| round t }
+        SetSeed int ->
+            ( { model | seed = Just <| initialSeed int }
             , Cmd.none
             )
 
-        ChangeMaze ->
+        NextMaze ->
             ( { model | seed = Maybe.map (Tuple.second << step bool) model.seed }
             , Cmd.none
             )

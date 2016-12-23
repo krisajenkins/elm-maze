@@ -40,7 +40,7 @@ root model =
                                 (frame.width + 2)
                                 (frame.height + 2)
                             )
-                        , Html.onClick ChangeMaze
+                        , Html.onClick NextMaze
                         ]
                         [ border frame
                         , g []

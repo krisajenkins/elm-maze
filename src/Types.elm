@@ -1,14 +1,13 @@
 module Types exposing (..)
 
 import Random exposing (..)
-import Time exposing (Time)
 import Window
 
 
 type Msg
-    = ChangeMaze
+    = NextMaze
+    | SetSeed Int
     | Resize Window.Size
-    | StartupTime Time
 
 
 type alias Model =
