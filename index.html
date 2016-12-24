@@ -10166,27 +10166,6 @@ var _krisajenkins$formatting$Formatting$roundTo = function (n) {
 			}));
 };
 var _krisajenkins$formatting$Formatting$dp = _krisajenkins$formatting$Formatting$roundTo;
-var _user$project$Types$reducer = F3(
-	function (splitter, subBox, _p0) {
-		var _p1 = _p0;
-		var _p2 = A2(splitter, subBox, _p1._1);
-		var subPartitions = _p2._0;
-		var newSeed = _p2._1;
-		return {
-			ctor: '_Tuple2',
-			_0: _elm_lang$core$List$concat(
-				{
-					ctor: '::',
-					_0: _p1._0,
-					_1: {
-						ctor: '::',
-						_0: subPartitions,
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: newSeed
-		};
-	});
 var _user$project$Types$Model = F2(
 	function (a, b) {
 		return {frame: a, seed: b};
@@ -10202,149 +10181,199 @@ var _user$project$Types$Box = F4(
 var _user$project$Types$Resize = function (a) {
 	return {ctor: 'Resize', _0: a};
 };
-var _user$project$Types$ChangeMaze = {ctor: 'ChangeMaze'};
+var _user$project$Types$SetSeed = function (a) {
+	return {ctor: 'SetSeed', _0: a};
+};
+var _user$project$Types$NextMaze = {ctor: 'NextMaze'};
 var _user$project$Types$Vertical = {ctor: 'Vertical'};
 var _user$project$Types$Horizontal = {ctor: 'Horizontal'};
 var _user$project$Types$rotate = function (direction) {
-	var _p3 = direction;
-	if (_p3.ctor === 'Vertical') {
+	var _p0 = direction;
+	if (_p0.ctor === 'Vertical') {
 		return _user$project$Types$Horizontal;
 	} else {
 		return _user$project$Types$Vertical;
 	}
 };
-var _user$project$Types$splitBox = F4(
-	function (direction, depth, box, seed) {
-		if (_elm_lang$core$Native_Utils.eq(direction, _user$project$Types$Horizontal) && (_elm_lang$core$Native_Utils.cmp(box.width, 1) < 1)) {
-			return {
-				ctor: '_Tuple2',
-				_0: {ctor: '[]'},
-				_1: seed
-			};
-		} else {
-			if (_elm_lang$core$Native_Utils.eq(direction, _user$project$Types$Vertical) && (_elm_lang$core$Native_Utils.cmp(box.height, 1) < 1)) {
-				return {
-					ctor: '_Tuple2',
-					_0: {ctor: '[]'},
-					_1: seed
-				};
-			} else {
-				var y1 = box.y;
-				var x1 = box.x;
-				var _p4 = A2(
-					_elm_lang$core$Random$step,
-					A2(
-						_elm_lang$core$Random$pair,
-						A2(_elm_lang$core$Random$int, 1, box.width - 1),
-						A2(_elm_lang$core$Random$int, 1, box.height - 1)),
-					seed);
-				var xSplit = _p4._0._0;
-				var ySplit = _p4._0._1;
-				var newSeed = _p4._1;
-				var x2 = box.x + xSplit;
-				var y2 = box.y + ySplit;
-				return A3(
-					_elm_lang$core$List$foldl,
-					_user$project$Types$reducer(
-						A2(
-							_user$project$Types$splitBox,
-							_user$project$Types$rotate(direction),
-							depth + 1)),
-					{
-						ctor: '_Tuple2',
-						_0: {
-							ctor: '::',
-							_0: function () {
-								var _p5 = direction;
-								if (_p5.ctor === 'Horizontal') {
-									return {
-										depth: depth,
-										direction: direction,
-										crossAt: y2,
-										a: {start: x1, length: xSplit - 1},
-										b: {start: x2, length: box.width - xSplit}
-									};
-								} else {
-									return {
-										depth: depth,
-										direction: direction,
-										crossAt: x2,
-										a: {start: y1, length: ySplit - 1},
-										b: {start: y2, length: box.height - ySplit}
-									};
-								}
-							}(),
-							_1: {ctor: '[]'}
-						},
-						_1: newSeed
-					},
-					function () {
-						var _p6 = direction;
-						if (_p6.ctor === 'Horizontal') {
-							return {
-								ctor: '::',
-								_0: {x: x1, y: y1, width: box.width, height: ySplit},
-								_1: {
-									ctor: '::',
-									_0: {x: x1, y: y2, width: box.width, height: box.height - ySplit},
-									_1: {ctor: '[]'}
-								}
-							};
-						} else {
-							return {
-								ctor: '::',
-								_0: {x: x1, y: y1, width: xSplit, height: box.height},
-								_1: {
-									ctor: '::',
-									_0: {x: x2, y: y1, width: box.width - xSplit, height: box.height},
-									_1: {ctor: '[]'}
-								}
-							};
-						}
-					}());
-			}
-		}
-	});
 var _user$project$State$subscriptions = function (_p0) {
 	return _elm_lang$window$Window$resizes(_user$project$Types$Resize);
 };
 var _user$project$State$update = F2(
 	function (msg, model) {
 		var _p1 = msg;
-		if (_p1.ctor === 'Resize') {
-			var _p2 = _p1._0;
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{
-						frame: _elm_lang$core$Maybe$Just(
-							{x: 0, y: 0, width: (_p2.width / 15) | 0, height: (_p2.height / 15) | 0}),
-						seed: _elm_lang$core$Random$initialSeed(_p2.width + _p2.height)
-					}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
-		} else {
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{
-						seed: _elm_lang$core$Tuple$second(
-							A2(_elm_lang$core$Random$step, _elm_lang$core$Random$bool, model.seed))
-					}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
+		switch (_p1.ctor) {
+			case 'Resize':
+				var _p2 = _p1._0;
+				var mazeSimplicity = 30;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							frame: _elm_lang$core$Maybe$Just(
+								{x: 0, y: 0, width: (_p2.width / mazeSimplicity) | 0, height: (_p2.height / mazeSimplicity) | 0})
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'SetSeed':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							seed: _elm_lang$core$Maybe$Just(
+								_elm_lang$core$Random$initialSeed(_p1._0))
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							seed: A2(
+								_elm_lang$core$Maybe$map,
+								function (_p3) {
+									return _elm_lang$core$Tuple$second(
+										A2(_elm_lang$core$Random$step, _elm_lang$core$Random$bool, _p3));
+								},
+								model.seed)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _user$project$State$init = {
 	ctor: '_Tuple2',
-	_0: {
-		frame: _elm_lang$core$Maybe$Nothing,
-		seed: _elm_lang$core$Random$initialSeed(1)
-	},
-	_1: A2(_elm_lang$core$Task$perform, _user$project$Types$Resize, _elm_lang$window$Window$size)
+	_0: {frame: _elm_lang$core$Maybe$Nothing, seed: _elm_lang$core$Maybe$Nothing},
+	_1: _elm_lang$core$Platform_Cmd$batch(
+		{
+			ctor: '::',
+			_0: A2(_elm_lang$core$Task$perform, _user$project$Types$Resize, _elm_lang$window$Window$size),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$core$Task$perform,
+					function (_p4) {
+						return _user$project$Types$SetSeed(
+							_elm_lang$core$Basics$round(_p4));
+					},
+					_elm_lang$core$Time$now),
+				_1: {ctor: '[]'}
+			}
+		})
 };
+var _user$project$Maze$splitBox = F4(
+	function (direction, depth, box, seed) {
+		if (_elm_lang$core$Native_Utils.eq(direction, _user$project$Types$Horizontal) && (_elm_lang$core$Native_Utils.cmp(box.width, 1) < 1)) {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			if (_elm_lang$core$Native_Utils.eq(direction, _user$project$Types$Vertical) && (_elm_lang$core$Native_Utils.cmp(box.height, 1) < 1)) {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				var y1 = box.y;
+				var x1 = box.x;
+				var _p0 = A2(
+					_elm_lang$core$Random$step,
+					A2(
+						_elm_lang$core$Random$pair,
+						A2(_elm_lang$core$Random$int, 1, box.width - 1),
+						A2(_elm_lang$core$Random$int, 1, box.height - 1)),
+					seed);
+				var xSplit = _p0._0._0;
+				var ySplit = _p0._0._1;
+				var newSeed = _p0._1;
+				var x2 = box.x + xSplit;
+				var y2 = box.y + ySplit;
+				return _elm_lang$core$Maybe$Just(
+					{
+						ctor: '_Tuple2',
+						_0: function () {
+							var _p1 = direction;
+							if (_p1.ctor === 'Horizontal') {
+								return {
+									ctor: '_Tuple3',
+									_0: {
+										depth: depth,
+										direction: direction,
+										crossAt: y2,
+										a: {start: x1, length: xSplit - 1},
+										b: {start: x2, length: box.width - xSplit}
+									},
+									_1: A4(_user$project$Types$Box, x1, y1, box.width, ySplit),
+									_2: A4(_user$project$Types$Box, x1, y2, box.width, box.height - ySplit)
+								};
+							} else {
+								return {
+									ctor: '_Tuple3',
+									_0: {
+										depth: depth,
+										direction: direction,
+										crossAt: x2,
+										a: {start: y1, length: ySplit - 1},
+										b: {start: y2, length: box.height - ySplit}
+									},
+									_1: A4(_user$project$Types$Box, x1, y1, xSplit, box.height),
+									_2: A4(_user$project$Types$Box, x2, y1, box.width - xSplit, box.height)
+								};
+							}
+						}(),
+						_1: newSeed
+					});
+			}
+		}
+	});
+var _user$project$Maze$reduceWithSeed = F2(
+	function (f, _p2) {
+		var _p3 = _p2;
+		var _p4 = f(_p3._1);
+		var newPartitions = _p4._0;
+		var newSeed = _p4._1;
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_lang$core$List$append, _p3._0, newPartitions),
+			_1: newSeed
+		};
+	});
+var _user$project$Maze$generateStep = F4(
+	function (direction, depth, box, seed) {
+		var _p5 = A4(_user$project$Maze$splitBox, direction, depth, box, seed);
+		if (_p5.ctor === 'Nothing') {
+			return {
+				ctor: '_Tuple2',
+				_0: {ctor: '[]'},
+				_1: seed
+			};
+		} else {
+			var substep = A2(
+				_user$project$Maze$generateStep,
+				_user$project$Types$rotate(direction),
+				depth + 1);
+			return A3(
+				_elm_lang$core$List$foldl,
+				_user$project$Maze$reduceWithSeed,
+				{
+					ctor: '_Tuple2',
+					_0: {
+						ctor: '::',
+						_0: _p5._0._0._0,
+						_1: {ctor: '[]'}
+					},
+					_1: _p5._0._1
+				},
+				{
+					ctor: '::',
+					_0: substep(_p5._0._0._1),
+					_1: {
+						ctor: '::',
+						_0: substep(_p5._0._0._2),
+						_1: {ctor: '[]'}
+					}
+				});
+		}
+	});
+var _user$project$Maze$generate = A2(_user$project$Maze$generateStep, _user$project$Types$Horizontal, 0);
 var _user$project$View$drawWall = F5(
 	function (depth, px1, px2, py1, py2) {
 		var lineTime = 500;
@@ -10657,11 +10686,10 @@ var _user$project$View$border = function (frame) {
 		});
 };
 var _user$project$View$root = function (model) {
-	var _p3 = model.frame;
-	if (_p3.ctor === 'Nothing') {
-		return _elm_lang$svg$Svg$text('');
-	} else {
-		var _p4 = _p3._0;
+	var _p3 = {ctor: '_Tuple2', _0: model.frame, _1: model.seed};
+	if (((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Just')) && (_p3._1.ctor === 'Just')) {
+		var _p5 = _p3._1._0;
+		var _p4 = _p3._0._0;
 		return A3(
 			_elm_lang$html$Html_Keyed$node,
 			'div',
@@ -10670,7 +10698,7 @@ var _user$project$View$root = function (model) {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: _elm_lang$core$Basics$toString(model.seed),
+					_0: _elm_lang$core$Basics$toString(_p5),
 					_1: A2(
 						_elm_lang$svg$Svg$svg,
 						{
@@ -10709,7 +10737,7 @@ var _user$project$View$root = function (model) {
 											_p4.height + 2)),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$ChangeMaze),
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$NextMaze),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -10727,13 +10755,15 @@ var _user$project$View$root = function (model) {
 										_elm_lang$core$List$map,
 										_elm_lang$svg$Svg_Lazy$lazy(_user$project$View$drawPartition),
 										_elm_lang$core$Tuple$first(
-											A4(_user$project$Types$splitBox, _user$project$Types$Horizontal, 0, _p4, model.seed)))),
+											A2(_user$project$Maze$generate, _p4, _p5)))),
 								_1: {ctor: '[]'}
 							}
 						})
 				},
 				_1: {ctor: '[]'}
 			});
+	} else {
+		return _elm_lang$svg$Svg$text('');
 	}
 };
 var _user$project$Main$main = _elm_lang$html$Html$program(
